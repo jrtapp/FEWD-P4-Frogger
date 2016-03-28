@@ -134,7 +134,7 @@ Player.prototype.update = function () {
 	this.gems = allRewards.length;
 
 	// Determine if player won: collected all gems on all levels
-	if (this.gems == 5 & this.level == 5) {
+	if (this.gems == 5 && this.level == 5) {
 		this.isWinner = true;
 	}
 
@@ -185,7 +185,7 @@ var Level = function (sprite) {
 			'images/heart.png',
 			'images/star.png'
 	];
-}
+};
 
 // Render Level display banner
 Level.prototype.render = function () {
@@ -223,12 +223,12 @@ Level.prototype.render = function () {
 	// Write level banner
 	leftMargin = (canvas.width - messageWidth) / 2.0;
 	ctx.fillText(levelMessage, leftMargin, fontHeight + 10);
-}
+};
 
 // Update Level Banner
 Level.prototype.update = function (playerLevel) {
 	this.playerLevel = playerLevel;
-}
+};
 
 // Define reward object
 var Reward = function (sprite) {
