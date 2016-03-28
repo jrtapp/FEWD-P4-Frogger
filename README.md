@@ -1,9 +1,8 @@
-frontend-nanodegree-arcade-game
-===============================
+# frontend-nanodegree-arcade-game
 
-Game Rules
-----------
-Goal:
+## Game Rules
+
+### Goal:
 Make like a chicken and cross the road.... without getting hit.
 
 To play the game:
@@ -13,8 +12,7 @@ To play the game:
 - If you get hit, you are returned to the start position
 - The game is over when you have won all the blue, green and orange gems, hearts and stars.
 
-License
-=======
+## License
 MIT License
 
 Copyright (c) 2016 John Tapp
@@ -36,3 +34,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Resources
+[MIT License Text](http://choosealicense.com/licenses/mit/)

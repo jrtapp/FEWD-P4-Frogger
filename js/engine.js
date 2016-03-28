@@ -96,6 +96,8 @@ var Engine = (function (global) {
 			enemy.update(dt);
 		});
 		player.update();
+		if (player.isWinner) reset();
+		level.update(player.level);
 	}
 
 	/* This function initially draws the "game level", it will then call
@@ -157,6 +159,8 @@ var Engine = (function (global) {
 		});
 
 		player.render();
+
+		if (!player.isWinner) level.render();
 	}
 
 	/* This function does nothing but it could have been a good place to
@@ -164,13 +168,6 @@ var Engine = (function (global) {
 	 * those sorts of things. It's only called once by the init() method.
 	 */
 	function reset() {
-		var font = "bold 50px sans-serif",
-			style = "red",
-			message = "Sorry, try again",
-			x = 40, y = 200;
-		ctx.font = font;
-		ctx.fillStyle = style;
-		ctx.fillText(message, x, y);
 	}
 
 	/* Go ahead and load all of the images we know we're going to need to
@@ -183,6 +180,10 @@ var Engine = (function (global) {
 			'images/grass-block.png',
 			'images/enemy-bug.png',
 			'images/char-boy.png',
+			'images/char-cat-girl.png',
+			'images/char-horn-girl.png',
+			'images/char-pink-girl.png',
+			'images/char-princess-girl.png',
 			'images/gem blue.png',
 			'images/gem green.png',
 			'images/gem orange.png',

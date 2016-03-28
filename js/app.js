@@ -38,9 +38,10 @@ Enemy.prototype.render = function () {
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
-var player = function () {
+var Player = function () {
 	this.sprite = 'images/char-boy.png';  // player sprite
 	this.level = 0; // player level
+	this.gems = 0; // awarded gems
 	this.x = 0; // starting x coordinate
 	this.y = 68 + 85 * 4; // starting y coordinate
 	// Compute width of player sprite
@@ -51,32 +52,33 @@ var player = function () {
 	this.height = function () {
 		return Resources.get(this.sprite).height;
 	};
+	this.isWinner = false;
 };
 
 // Handle player/enemy collisions
-player.prototype.isCollision = function (player, enemy) {
+Player.prototype.isCollision = function (player, enemy) {
 	// initialize collision status to false
 	var collision = false;
 
 	// Compute current player and enemy horizontal centers
-	var playerHCenter = player.x + player.width() / 2;
+	var playerHCenter = this.x + this.width() / 2;
 	var enemyHCenter = enemy.x + enemy.width() / 2;
 
 	// Test for same row, if y coordinates are within 50, player and enemy are on same row
-	if (Math.abs(player.y - enemy.y) < 50) {
+	if (Math.abs(this.y - enemy.y) < 50) {
 		// Test for same column, if player and enemy centers are within 90% of player width, collision is true
-		if (Math.abs(playerHCenter - enemyHCenter) < 0.9 * player.width()) {
+		if (Math.abs(playerHCenter - enemyHCenter) < 0.9 * this.width()) {
 			collision = true;
-		};
-	};
+		}
+	}
 
 	// return collision status
 	return collision;
 };
 
 // Determine if player has reached goal and reward according to player level
-player.prototype.isWinner = function () {
-	var winner = false;
+Player.prototype.isLeveledUp = function () {
+	var leveledUp = false;
 
 	// sprites array is used to identify current reward
 	var sprites = [
@@ -87,8 +89,8 @@ player.prototype.isWinner = function () {
 		'images/star.png'
 	];
 
-	// If player is within 100 px of top of canvas, player is a winner
-	if (this.y < 100) {
+	// If player is within 50 px of top of canvas (because of offset to center player on tile), player levels up
+	if (this.y < 0) {
 
 		// Determine how many rewards player has won
 		var rewardCount = allRewards.length;
@@ -97,96 +99,161 @@ player.prototype.isWinner = function () {
 		if (rewardCount == 5) {
 			clearRewards();
 			this.level++;
-		};
+		}
 
-		// Add new reward to allRewards, and set winner to true
-		allRewards.push(new reward(sprites[this.level]));
-		winner = true;
-	};
+		// If player has not reached top level, add new reward to allRewards, and set leveledUp to true
+		if (this.level < sprites.length) {
+			allRewards.push(new Reward(sprites[this.level]));
+		}
 
-	// return winner status
-	return winner;
+		// Player has leveled up
+		leveledUp = true;
+	}
+
+	// return leveledUp status
+	return leveledUp;
 };
 
 // Move player to starting position
-player.prototype.reset = function () {
+Player.prototype.reset = function () {
 	this.x = 0;
 	this.y = 68 + 85 * 4;
 };
 
 // Update player based on possible collision or success
-player.prototype.update = function () {
+Player.prototype.update = function () {
 	for (var idx = 0; idx < allEnemies.length; idx++) {
 
 		// Handle Collision
-		if (player.isCollision(player, allEnemies[idx])) {
+		if (this.isCollision(player, allEnemies[idx])) {
 			this.reset();
 		}
 	}
 
-	//  If winner, reset to starting position
-	if (this.isWinner()) this.reset();
+	// Update gem count
+	this.gems = allRewards.length;
+
+	// Determine if player won: collected all gems on all levels
+	if (this.gems == 5 & this.level == 5) {
+		this.isWinner = true;
+	}
+
+	//  If player levels up, reset to starting position
+	if (this.isLeveledUp()) this.reset();
 };
 
 // Render player and run update to check status
-player.prototype.render = function () {
+Player.prototype.render = function () {
 	ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 	this.update();
 };
 
 // Handle keyboard input to move player
 // Paarameter: keycode - keyboard input from user
-player.prototype.handleInput = function (keycode) {
+Player.prototype.handleInput = function (keycode) {
 	// Set stepsizes
-	var lrStepsize = canvas.width / 5;
-	var udStepsize = canvas.width / 6;
+	var LR_STEPSIZE = canvas.width / 5;
+	var UD_STEPSIZE = canvas.width / 6;
 
 	// Based on keycode provided set new player coordinates
 	// Do not move if the requested move would make the player move offscreen
 	switch (keycode) {
 		case 'right':
-			if (this.x + lrStepsize < canvas.width - 70) this.x += lrStepsize;
+			if (this.x + LR_STEPSIZE < canvas.width - 70) this.x += LR_STEPSIZE;
 			break;
 		case 'left':
-			if (this.x - lrStepsize >= 0) this.x -= lrStepsize;
+			if (this.x - LR_STEPSIZE >= 0) this.x -= LR_STEPSIZE;
 			break;
 		case 'up':
-			if (this.y - udStepsize >= -70) this.y -= udStepsize;
+			if (this.y - UD_STEPSIZE >= -70) this.y -= UD_STEPSIZE;
 			break;
 		case 'down':
-			if (this.y + udStepsize < canvas.height - 170) this.y += udStepsize;
+			if (this.y + UD_STEPSIZE < canvas.height - 170) this.y += UD_STEPSIZE;
 			break;
 		default:
 			break;
 	}
 };
 
+// Define Level class for Level display banner
+var Level = function (sprite) {
+	this.message = "Player Level: ";
+	this.playerLevel = 1;
+	this.Sprites = ['images/gem blue.png',
+			'images/gem green.png',
+			'images/gem orange.png',
+			'images/heart.png',
+			'images/star.png'
+	];
+}
+
+// Render Level display banner
+Level.prototype.render = function () {
+	// Set formats
+	var fontHeight = 30;
+	ctx.font = fontHeight + "px helvetica";
+
+	// Clear level display area, initialize message settings
+	ctx.clearRect(0, 0, canvas.width, 50);
+	var levelMessage = "";
+	var messageWidth = 0;
+	var leftMargin = 0;
+
+	// Display status message
+	if (this.playerLevel < this.Sprites.length) {  // Player still playing
+		// Get and scale sprite
+		var sprite = Resources.get(this.Sprites[this.playerLevel]);
+		var scaleHeight = 0.25 * sprite.height;
+		var scaleWidth = 0.25 * sprite.width;
+
+		// Set font color and message
+		ctx.fillStyle = "black";
+		levelMessage = this.message + (this.playerLevel + 1);
+		messageWidth = ctx.measureText(levelMessage).width;
+
+		// Draw current level sprite
+		ctx.drawImage(sprite, leftMargin + messageWidth, 0, scaleWidth, scaleHeight);
+	} else { // Player Won
+		// Set font color and message
+		ctx.fillStyle = "red";
+		levelMessage = "You Won!!";
+		messageWidth = ctx.measureText(levelMessage).width;
+	}
+
+	// Write level banner
+	leftMargin = (canvas.width - messageWidth) / 2.0;
+	ctx.fillText(levelMessage, leftMargin, fontHeight + 10);
+}
+
+// Update Level Banner
+Level.prototype.update = function (playerLevel) {
+	this.playerLevel = playerLevel;
+}
+
 // Define reward object
-var reward = function (sprite) {
+var Reward = function (sprite) {
 	this.x = 0;
 	this.y = 40;
 	this.sprite = sprite;
 };
 
 // Render reward sprites
-reward.prototype.render = function () {
+Reward.prototype.render = function () {
 	// Get sprite and set output scaling
 	var sprite = Resources.get(this.sprite);
-	var scaleHeight = .5 * sprite.height;
-	var scaleWidth = .5 * sprite.width;
+	var scaleHeight = 0.5 * sprite.height;
+	var scaleWidth = 0.5 * sprite.width;
 
 	// for each award, draw the scaled sprite
 	for (var idx = 0; idx < allRewards.length; idx++) {
 		ctx.drawImage(sprite, 25 + 101 * idx, this.y, scaleWidth, scaleHeight);
-	};
+	}
 };
 
 // Clear reward tally
 function clearRewards() {
-	for (var idx = 0; idx < rewardCount; idx++) {
-		allRewards.pop();
-	};
-};
+	allRewards = [];
+}
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
@@ -197,11 +264,11 @@ var allRewards = [];
 
 for (var idx = 0; idx < enemyCount; idx++) {
 	var e = new Enemy(idx % 3 + 1);
-
 	allEnemies.push(e);
-};
+}
 
-var player = new player();
+var player = new Player();
+var level = new Level();
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
