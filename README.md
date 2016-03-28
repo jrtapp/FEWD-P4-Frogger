@@ -6,6 +6,7 @@
 Make like a chicken and cross the road.... without getting hit.
 
 To play the game:
+- Open index.html in your browser, JavaScript is required.
 - Use the left, right, up and down cursor keys to move the player.
 - Once you cross the road, you will get a reward.
 - Your player level increases as you fill up the blocks at the top with rewards.
