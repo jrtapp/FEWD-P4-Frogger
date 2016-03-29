@@ -56,7 +56,7 @@ var Player = function () {
 };
 
 // Handle player/enemy collisions
-Player.prototype.isCollision = function (player, enemy) {
+Player.prototype.isCollision = function (enemy) {
 	// initialize collision status to false
 	var collision = false;
 
@@ -125,7 +125,7 @@ Player.prototype.update = function () {
 	for (var idx = 0; idx < allEnemies.length; idx++) {
 
 		// Handle Collision
-		if (this.isCollision(player, allEnemies[idx])) {
+		if (this.isCollision(allEnemies[idx])) {
 			this.reset();
 		}
 	}
@@ -210,6 +210,7 @@ Level.prototype.render = function () {
 		ctx.fillStyle = "black";
 		levelMessage = this.message + (this.playerLevel + 1);
 		messageWidth = ctx.measureText(levelMessage).width;
+		leftMargin = (canvas.width - messageWidth) / 2.0;
 
 		// Draw current level sprite
 		ctx.drawImage(sprite, leftMargin + messageWidth, 0, scaleWidth, scaleHeight);
@@ -218,10 +219,10 @@ Level.prototype.render = function () {
 		ctx.fillStyle = "red";
 		levelMessage = "You Won!!";
 		messageWidth = ctx.measureText(levelMessage).width;
+		leftMargin = (canvas.width - messageWidth) / 2.0;
 	}
 
 	// Write level banner
-	leftMargin = (canvas.width - messageWidth) / 2.0;
 	ctx.fillText(levelMessage, leftMargin, fontHeight + 10);
 };
 

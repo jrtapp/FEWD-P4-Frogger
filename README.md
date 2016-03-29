@@ -12,6 +12,7 @@ To play the game:
 - Your player level increases as you fill up the blocks at the top with rewards.
 - If you get hit, you are returned to the start position
 - The game is over when you have won all the blue, green and orange gems, hearts and stars.
+- To restart the game, reload the page in the browser (Ctrl-R or F5)
 
 ## License
 MIT License
